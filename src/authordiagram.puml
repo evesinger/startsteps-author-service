@@ -1,0 +1,59 @@
+@startuml
+class Author {
+    - id: Long
+    - firstName: String
+    - lastName: String
+    - email: String
+}
+
+interface AuthorRepository {
+    + save(author): Author
+    + findById(id): Optional<Author>
+    + findAll(): List<Author>
+    + delete(author): void
+}
+
+class AuthorService {
+    + createAuthor(author): Author
+    + getAllAuthors(): List<Author>
+    + getAuthorWithArticles(id): Author
+    + createArticleForAuthor(id, article): void
+}
+
+class AuthorController {
+    + createAuthor(author): Response
+    + getAllAuthors(): Response
+    + getAuthorWithArticles(id): Response
+    + createArticleForAuthor(id, article): Response
+}
+
+class ArticleClient {
+    + getArticlesByAuthor(authorId): List<Article>
+    + createArticleForAuthor(authorId, article): void
+}
+
+class Article {
+    - id: Long
+    - title: String
+    - content: String
+    - authorId: Long
+}
+
+class ArticleServiceNode {
+    + createArticle(authorId, article): Article
+    + getArticlesByAuthor(authorId): List<Article>
+}
+
+class ArticleControllerNode {
+    + POST /articles/author/{authorId}
+    + GET /articles/author/{authorId}
+}
+
+AuthorController --> AuthorService : calls
+AuthorService --> AuthorRepository : uses
+AuthorRepository --> Author : manages
+AuthorService --> ArticleClient : uses
+ArticleClient --> ArticleControllerNode : HTTP request
+ArticleControllerNode --> ArticleServiceNode : calls
+ArticleServiceNode --> Article : manages
+@enduml
