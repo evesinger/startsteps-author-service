@@ -29,12 +29,6 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- Springboot Security Starter (For Authentication & Authorization) -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-
     <!-- Springboot Data JPA (PostgreSQL Database) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -51,13 +45,6 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
-    </dependency>
-
-    <!-- Spring Security Crypto (For Password Hashing & Encryption) -->
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-crypto</artifactId>
-      <version>6.2.0</version> <!-- Explicit version needed -->
     </dependency>
 
     <!-- Lombok (For Reducing Boilerplate Code like Getters, Setters..) -->
