@@ -6,16 +6,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/authors")
-
 public class AuthorController {
 
     private final AuthorService authorService;
 
-    // Constructor Injection
+    // Constructor-based dependency injection
     public AuthorController(AuthorService authorService) {
         this.authorService = authorService;
     }
@@ -34,18 +34,29 @@ public class AuthorController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Create a new author
-    @PostMapping
-    public ResponseEntity<Author> createAuthor(@RequestBody Author author) {
-        return ResponseEntity.ok(authorService.createAuthor(author));
-    }
-
     // Update an existing author
     @PutMapping("/{id}")
     public ResponseEntity<Author> updateAuthor(@PathVariable Long id, @RequestBody Author authorDetails) {
         try {
             Author updatedAuthor = authorService.updateAuthor(id, authorDetails);
             return ResponseEntity.ok(updatedAuthor);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Update only the introduction
+    @PutMapping("/{id}/update-introduction")
+    public ResponseEntity<?> updateIntroduction(@PathVariable Long id, @RequestBody Map<String, String> requestBody) {
+        String newIntroduction = requestBody.get("introduction");
+
+        if (newIntroduction == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Introduction cannot be null"));
+        }
+
+        try {
+            Author updatedAuthor = authorService.updateIntroduction(id, newIntroduction);
+            return ResponseEntity.ok(Map.of("message", "Introduction updated successfully", "author", updatedAuthor));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
