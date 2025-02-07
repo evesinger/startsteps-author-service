@@ -58,9 +58,10 @@ public class AuthorController {
             Author updatedAuthor = authorService.updateIntroduction(id, newIntroduction);
             return ResponseEntity.ok(Map.of("message", "Introduction updated successfully", "author", updatedAuthor));
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body(Map.of("error", "Author not found"));
         }
     }
+
 
     // Delete an author by ID
     @DeleteMapping("/{id}")

@@ -37,7 +37,7 @@ public class AuthController {
         }
     }
 
-    // Login an Author and Return `author_id`
+    // Login an Author and Return `author_id` and role
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         String email = loginData.get("email");
@@ -52,10 +52,15 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials."));
         }
 
-        // Debugging: Log the full response before sending it
+        // Ensure `role` is included in response
         Map<String, Object> response = authResult.get();
-        System.out.println("Sending response: " + response);
+        if (!response.containsKey("author_id") || !response.containsKey("role")) {
+            System.out.println("❌ Missing role in auth result for email: " + email);
+            return ResponseEntity.status(500).body(Map.of("error", "Author ID or Role missing in response."));
+        }
 
+        System.out.println("✅ Login Successful: " + response);
         return ResponseEntity.ok(response);
     }
 }
+

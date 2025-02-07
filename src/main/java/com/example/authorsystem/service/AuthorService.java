@@ -39,9 +39,9 @@ public class AuthorService {
         }).orElseThrow(() -> new RuntimeException("Author not found"));
     }
 
-    public Author updateIntroduction(Long id, String introduction) {
+    public Author updateIntroduction(Long id, String newIntroduction) {
         return authorRepository.findById(id).map(author -> {
-            author.setIntroduction(introduction);
+            author.setIntroduction(newIntroduction);
             return authorRepository.save(author);
         }).orElseThrow(() -> new RuntimeException("Author not found"));
     }

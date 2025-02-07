@@ -37,19 +37,21 @@ public class AuthService {
 
             // Directly compare plain text passwords
             if (password.equals(storedPassword)) {
-                System.out.println("Authentication successful for email: " + email);
+                System.out.println("✅ Authentication successful for email: " + email);
 
-                // Return response with `author_id`
+                // Return response with `author_id` and `role`
                 Map<String, Object> response = new HashMap<>();
-                response.put("author_id", author.get().getId()); //
+                response.put("author_id", author.get().getId());
                 response.put("email", author.get().getEmail());
+                response.put("role", author.get().getRole().name()); // Convert Enum to String
 
+                System.out.println("🔹 Login Response: " + response);
                 return Optional.of(response);
             } else {
-                System.out.println("Password mismatch for email: " + email);
+                System.out.println("❌ Password mismatch for email: " + email);
             }
         } else {
-            System.out.println("Email not found: " + email);
+            System.out.println("❌ Email not found: " + email);
         }
 
         return Optional.empty();
