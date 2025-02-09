@@ -1,8 +1,3 @@
-/*pseudo code: Repository interface for managing `Author` database interactions
-- import author entity
-- import Jpa for built in crud methods for DB operations
-- AutoRepository interface extendding Jpa (Jpa takes 2 type paramater: entity class + primary key type)
-* */
 
 package com.example.authorsystem.repository;
 

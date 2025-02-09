@@ -1,5 +1,6 @@
 package com.example.authorsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,12 +15,14 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
-    private Long id; // Unique ID
+    private Long id;
 
-    @Column(nullable = false) // Cannot be empty
+    @JsonProperty("first_name") // Maps JSON "first_name" to Java "firstName"
+    @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false) // Cannot be empty
+    @JsonProperty("last_name") // Maps JSON "last_name" to Java "lastName"
+    @Column(nullable = false)
     private String lastName;
 
     @Column(nullable = false, unique = true)
@@ -38,9 +41,9 @@ public class Author {
 
     @Enumerated(EnumType.STRING) // Store as string in DB
     @Column(nullable = false)
-    private Role role; // New role column
+    private Role role;
 
-    //Correct constructor (excluding ID because it's auto-generated)
+    //Constructor (excluding ID because it's auto-generated)
     public Author(String firstName, String lastName, String email, String password, String profileImage, String introduction, boolean active, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;

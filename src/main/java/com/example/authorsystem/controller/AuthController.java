@@ -1,6 +1,7 @@
 package com.example.authorsystem.controller;
 
 import com.example.authorsystem.model.Author;
+import com.example.authorsystem.model.Role;
 import com.example.authorsystem.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,59 +9,84 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost:3000") // Allowing FE requests (not working without this)
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
 
-    // Constructor-based dependency injection
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
-    // Register a New Author and Return `author_id`
+    // Register a new Author with default role `AUTHOR`
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Author author) {
         try {
-            Author registeredAuthor = authService.registerAuthor(author);
-            System.out.println("Registration successful for: " + registeredAuthor.getEmail());
+            // Default all new users to AUTHOR role
+            author.setRole(Role.AUTHOR);
 
+            Author registeredAuthor = authService.registerAuthor(author);
             return ResponseEntity.ok(Map.of(
                     "author_id", registeredAuthor.getId(),
-                    "email", registeredAuthor.getEmail()
+                    "first_name", registeredAuthor.getFirstName(), //  Include firstName
+                    "last_name", registeredAuthor.getLastName(),
+                    "email", registeredAuthor.getEmail(),
+                    "role", registeredAuthor.getRole().name()
             ));
         } catch (Exception e) {
-            System.out.println("Registration failed: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    // Login an Author and Return `author_id` and role
+    //Login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         String email = loginData.get("email");
         String password = loginData.get("password");
 
-        System.out.println("Login attempt with email: " + email);
-
         Optional<Map<String, Object>> authResult = authService.authenticate(email, password);
-
         if (authResult.isEmpty()) {
-            System.out.println("Login failed for email: " + email);
             return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials."));
         }
 
-        // Ensure `role` is included in response
-        Map<String, Object> response = authResult.get();
-        if (!response.containsKey("author_id") || !response.containsKey("role")) {
-            System.out.println("❌ Missing role in auth result for email: " + email);
-            return ResponseEntity.status(500).body(Map.of("error", "Author ID or Role missing in response."));
-        }
+        return ResponseEntity.ok(authResult.get());
+    }
 
-        System.out.println("✅ Login Successful: " + response);
-        return ResponseEntity.ok(response);
+    // Update role (only chiefs)
+    @PutMapping("/update-role/{id}")
+    public ResponseEntity<?> updateAuthorRole(
+            @PathVariable Long id,
+            @RequestHeader("x-author-id") Long authorId,
+            @RequestHeader("x-user-role") String userRole,
+            @RequestBody Map<String, String> requestBody) {
+        try {
+            String newRoleString = requestBody.get("role");
+
+            if (newRoleString == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Role is required."));
+            }
+            // Convert role to ENUM
+            Role newRole = Role.valueOf(newRoleString.toUpperCase());
+
+            // Only chiefs
+            if (!userRole.equalsIgnoreCase("CHIEF_EDITOR")) {
+                return ResponseEntity.status(403).body(Map.of("error", "Only Chief Editors can update roles."));
+            }
+
+            Author updatedAuthor = authService.updateAuthorRole(authorId, id, newRole);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Role updated successfully",
+                    "author_id", updatedAuthor.getId(),
+                    "email", updatedAuthor.getEmail(),
+                    "role", updatedAuthor.getRole().name()
+            ));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid role. Allowed values: AUTHOR, CHIEF_EDITOR"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
+        }
     }
 }
-
