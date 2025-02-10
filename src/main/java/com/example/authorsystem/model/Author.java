@@ -28,6 +28,8 @@ public class Author {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "profile_image", nullable = true)
+    @JsonProperty("profile_image")
     private String profileImage;
 
     @Column(nullable = false)

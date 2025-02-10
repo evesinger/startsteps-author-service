@@ -30,9 +30,10 @@ public class AuthController {
             Author registeredAuthor = authService.registerAuthor(author);
             return ResponseEntity.ok(Map.of(
                     "author_id", registeredAuthor.getId(),
-                    "first_name", registeredAuthor.getFirstName(), //  Include firstName
+                    "first_name", registeredAuthor.getFirstName(),
                     "last_name", registeredAuthor.getLastName(),
                     "email", registeredAuthor.getEmail(),
+                    "profile_image", registeredAuthor.getProfileImage(),
                     "role", registeredAuthor.getRole().name()
             ));
         } catch (Exception e) {
