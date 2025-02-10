@@ -1,40 +1,59 @@
-/*
-pseudo code: (Author Table in PostgreSQL)
--import API, annotations, getters/setter(lombok)
-(Authors class represent authors table in the database, is mapped as a Entity for SB)
-- Entity (make class DB entity)
-- Table name
-- Getter/Setter
-- noArgument constructor
- */
 package com.example.authorsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity //table in DB
-@Table(name="authors")// table name
-@Getter //getter methods
-@Setter // setter methods
-@NoArgsConstructor // nor arg
-
-
+@Entity
+@Table(name = "authors") // Table name
+@Getter
+@Setter
+@NoArgsConstructor
 public class Author {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //auto-increment
-    private Long id; // unique ids
 
-    @Column(nullable = false) //can't be empty
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
+    private Long id;
+
+    @JsonProperty("first_name") // Maps JSON "first_name" to Java "firstName"
+    @Column(nullable = false)
     private String firstName;
 
-    @Column(nullable = false)//can't be empty
+    @JsonProperty("last_name") // Maps JSON "last_name" to Java "lastName"
+    @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false, unique = true)//can't be empty, must be unique
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "profile_image", nullable = true)
+    @JsonProperty("profile_image")
     private String profileImage;
 
+    @Column(nullable = false)
+    private String password;
+
+    @Column(columnDefinition = "TEXT")
+    private String introduction;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE") // Auto-activate accounts
+    private boolean active = true;
+
+    @Enumerated(EnumType.STRING) // Store as string in DB
+    @Column(nullable = false)
+    private Role role;
+
+    //Constructor (excluding ID because it's auto-generated)
+    public Author(String firstName, String lastName, String email, String password, String profileImage, String introduction, boolean active, Role role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.profileImage = profileImage;
+        this.introduction = introduction;
+        this.active = active;
+        this.role = role;
+    }
 }
